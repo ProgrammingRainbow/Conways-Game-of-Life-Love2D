@@ -1,4 +1,4 @@
-local CELL = 9
+local CELL = 10
 local SIZE = CELL - 1
 local WIDTH = love.graphics.getWidth()
 local HEIGHT = love.graphics.getHeight()
@@ -6,19 +6,21 @@ local HEIGHT = love.graphics.getHeight()
 local Game = {
 	_rows = math.floor(HEIGHT / CELL),
 	_columns = math.floor(WIDTH / CELL),
-	_delay_target = 8,
-	_delay_count = 1,
-	_pause = false,
 	_board = {},
 	_next_board = {},
+	_delay_target = 8,
+	_delay_count = 1,
+	_is_paused = false,
 }
 
 function Game:load()
+	math.randomseed(os.time())
+
 	-- Load and set font.
 	self.font = love.graphics.newFont("fonts/freesansbold.ttf", 24)
 	love.graphics.setFont(self.font)
 
-	-- Create 2 2D tables for boards.
+	-- Create 2D table for board.
 	for row = 1, self._rows do
 		self._board[row] = {}
 		self._next_board[row] = {}
@@ -32,26 +34,26 @@ function Game:load()
 end
 
 function Game:reset()
-	for row, rows in ipairs(self._board) do
-		for column, _ in ipairs(rows) do
+	for row, columns in ipairs(self._board) do
+		for column, _ in ipairs(columns) do
 			self._board[row][column] = love.math.random(0, 1)
 		end
 	end
 end
 
 function Game:clear()
-	for row, rows in ipairs(self._board) do
-		for column, _ in ipairs(rows) do
+	for row, columns in ipairs(self._board) do
+		for column, _ in ipairs(columns) do
 			self._board[row][column] = 0
 		end
 	end
 end
 
 function Game:pause()
-	if self._pause then
-		self._pause = false
+	if self._is_paused then
+		self._is_paused = false
 	else
-		self._pause = true
+		self._is_paused = true
 	end
 end
 
@@ -76,10 +78,10 @@ function Game:editBoard(x, y)
 end
 
 function Game:update()
-	if not self._pause then
+	if not self._is_paused then
 		if self._delay_count >= self._delay_target then
-			for row, rows in ipairs(self._board) do
-				for column, value in ipairs(rows) do
+			for row, columns in ipairs(self._board) do
+				for column, value in ipairs(columns) do
 					local count = 0
 					for y = row - 1, row + 1 do
 						for x = column - 1, column + 1 do
@@ -115,8 +117,8 @@ function Game:draw()
 	love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)
 
 	love.graphics.setColor(0.5, 0.5, 0.5)
-	for row, rows in ipairs(self._board) do
-		for column, value in ipairs(rows) do
+	for row, columns in ipairs(self._board) do
+		for column, value in ipairs(columns) do
 			if value == 1 then
 				local x = (column - 1) * CELL
 				local y = (row - 1) * CELL

@@ -13,5 +13,7 @@ function love.keypressed(key)
 		love.event.quit()
 	elseif key == "r" then
 		Game:reset()
+	elseif key == "c" then
+		Game:clear()
 	end
 end
